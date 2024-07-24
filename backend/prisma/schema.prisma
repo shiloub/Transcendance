@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum ChannelType {
+  PRIVATE
+  PUBLIC
+  DIRECT
+}
+
+
+enum ChannelRole {
+  DEFAULT
+  OWNER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  login     String @unique
+  username String @unique
+
+  messages Message[] @relation ("userMessages")
+  channelConnections ChannelConnection[] @relation("userConnection")
+  userConnections UserConnection[] @relation("userRelation")
+  avatarFileName String @default("default.jpg")
+
+  sessionId String
+  twoFaEnabled Boolean @default(false)
+  twoFaSecret String @default("")
+  isConnected Boolean @default(false)
+  isInGame Boolean @default(false)
+  
+  @@map("users")
+}
+
+model Invite {
+  id        Int      @id @default(autoincrement())
+  inviterUN String
+  targetUN String
+}
+
+model Game {
+  id        Int      @id @default(autoincrement())
+  login1 String
+  login2 String
+
+  score1 Int
+  score2 Int
+}
+
+model UserConnection {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  targetId Int
+  followed Int
+  blocked Int
+  user User @relation ("userRelation" , fields: [fromId], references: [id], onDelete: Cascade)
+  fromId Int
+  
+}
+
+model ChannelConnection {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  role ChannelRole
+  user User @relation ("userConnection" , fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  channel Channel @relation("channelConnection" , fields: [channelId], references: [id], onDelete: Cascade)
+  channelId Int
+  muted Int
+}
+
+
+model Message {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  author User @relation("userMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId Int
+  senderLogin String
+  channel Channel @relation("channelMessages", fields: [channelId], references: [id], onDelete: Cascade)
+  channelId Int
+  content String
+}
+
+model Channel {
+  id Int @id @default(autoincrement())
+  banned Int[]
+  invited Int[]
+  createdAt DateTime @default(now())
+  name String @unique
+  password String
+  type ChannelType
+  messages Message[] @relation("channelMessages")
+  channelConnections ChannelConnection[] @relation("channelConnection")
+}

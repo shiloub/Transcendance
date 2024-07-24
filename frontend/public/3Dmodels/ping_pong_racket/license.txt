@@ -1,0 +1,8 @@
+Model Information:
+* title:	Ping Pong Racket
+* source:	https://sketchfab.com/3d-models/ping-pong-racket-2327548c9eb0483ebca8ddf7d6bd4633
+* author:	RED2000 (https://sketchfab.com/RED2000)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
